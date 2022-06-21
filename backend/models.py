@@ -1,10 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+
 class User(AbstractUser):
 
     def __str__(self):
         return f"{self.id} - {self.username}"
+
 
 class Resume(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
@@ -19,5 +21,9 @@ class Resume(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['name', 'user'], name='unique_resume_name')
+            models.UniqueConstraint(
+                fields=[
+                    'name',
+                    'user'],
+                name='unique_resume_name')
         ]

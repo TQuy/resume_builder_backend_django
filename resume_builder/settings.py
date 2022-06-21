@@ -28,7 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "192.168.18.3",
     "127.0.0.1"
-    ]
+]
 
 
 # Application definition
@@ -148,4 +148,4 @@ CORS_ORIGIN_WHITELIST = [
     'http://192.168.18.2:81'
 ]
 
-AUTH_PASSWORD_VALIDATORS=[]
+AUTH_PASSWORD_VALIDATORS = []

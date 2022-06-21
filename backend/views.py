@@ -7,7 +7,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import User, Resume
 
-# Create your views here.    
+# Create your views here.
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -15,19 +16,20 @@ def list_resume(request):
     if request.method == 'GET':
         resume_list = request.user.resume_set.values('id', 'name')
         return Response(
-            data = {
-            'content': resume_list,
-            'message': 'Loaded list of resumes successfully'
-            }, 
-            status = status.HTTP_200_OK,
+            data={
+                'content': resume_list,
+                'message': 'Loaded list of resumes successfully'
+            },
+            status=status.HTTP_200_OK,
         )
     else:
         return Response(
             data={
-            'message': 'GET request required',
-            }, 
-            status=status.HTTP_400_BAD_REQUEST, 
+                'message': 'GET request required',
+            },
+            status=status.HTTP_400_BAD_REQUEST,
         )
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -51,6 +53,7 @@ def load_resume(request, resume_id):
             'message': 'GET request required'
         }, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def save_resume(request):
@@ -69,6 +72,7 @@ def save_resume(request):
         return Response({
             'message': 'POST request required',
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -89,6 +93,7 @@ def delete_resume(request, resume_id):
             'message': 'DELETE request required.'
         }, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 def register_view(request):
     if request.method == 'POST':
@@ -98,7 +103,7 @@ def register_view(request):
         if password != confirm_password:
             Response({
                 'message': 'Passwords must match.'
-            }, status==status.HTTP_409_CONFLICT)
+            }, status == status.HTTP_409_CONFLICT)
         try:
             user = User.objects.create_user(
                 username=username,
