@@ -27,16 +27,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "192.168.18.3",
-    "127.0.0.1"
+    "127.0.0.1",
+    "localhost",
 ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'backend',
+    'backend.apps.BackendConfig',
+    'authentication.apps.AuthenticationConfig',
     'corsheaders',
-    'rest_framework.authtoken',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -132,13 +133,13 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'backend.User'
+AUTH_USER_MODEL = 'authentication.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # 'rest_framework.authentication.BasicAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
     ]
 }
 
