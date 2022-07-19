@@ -16,11 +16,9 @@ from backend.serializers import ResumeSerializer
 def resumes(request, current_user):
     if request.method == 'GET':
         # list resumes of current user
-        resumes = current_user.resume_set.all()
-        resumes_json = ResumeSerializer(resumes, many=True)
-
+        resumes = current_user.resume_set.values('id', 'name')
         return Response({
-            "resumes": resumes_json.data
+            "resumes": resumes
         }, status=status.HTTP_200_OK)
 
     elif request.method == 'PUT':
@@ -61,7 +59,6 @@ def resume(request, current_user, resume_id):
             }, status=status.HTTP_404_NOT_FOUND)
 
         resume_json = ResumeSerializer(resume)
-
         return Response({
             'resume': resume_json.data
         }, status=status.HTTP_200_OK)
