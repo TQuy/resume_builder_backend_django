@@ -2,5 +2,4 @@ Django
 djangorestframework
 django-cors-headers
 pyjwt
-autopep8
 python-dotenv
