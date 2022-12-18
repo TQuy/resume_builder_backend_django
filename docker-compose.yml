@@ -1,8 +1,0 @@
-services:
-  backend:
-    build: .
-    command: gunicorn resume_builder.wsgi -b 0.0.0.0:8000
-    volumes:
-      - .:/backend
-    ports:
-      - "8000:8000"      
