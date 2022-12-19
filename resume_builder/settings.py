@@ -33,7 +33,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-v8)64mt&h#@en8f%t6-yi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = str2bool(os.environ.get('DEBUG', True))
 
-ALLOWED_HOSTS = json.loads(os.environ.get('ALLOWED_HOSTS', '["*"]'))
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 
 # Application definition
@@ -148,6 +148,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ORIGIN_WHITELIST = json.loads(os.environ.get('CORS_ORIGIN_WHITELIST', '["http://*", "https://*"]'))
+CORS_ORIGIN_WHITELIST = os.environ.get('CORS_ORIGIN_WHITELIST', "http://*, https://*").split(',')
 
 AUTH_PASSWORD_VALIDATORS = []
