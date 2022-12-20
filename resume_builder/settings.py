@@ -148,6 +148,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ORIGIN_WHITELIST = os.environ.get('CORS_ORIGIN_WHITELIST', "http://*, https://*").split(',')
+CORS_ALLOW_ALL_ORIGINS=str2bool(os.environ.get('CORS_ALLOW_ALL_ORIGINS', True))
 
 AUTH_PASSWORD_VALIDATORS = []

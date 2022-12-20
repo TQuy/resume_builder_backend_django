@@ -1,5 +1,7 @@
 .git
-venv
-README.md
+venv/
 __pycache__
 .env
+.ipynb_checkpoints
+requirements.txt
+**/static/
