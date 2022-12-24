@@ -18,10 +18,10 @@ from dotenv import load_dotenv
 from .utils import str2bool
 
 
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -29,7 +29,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-v8)64mt&h#@en8f%t6-yi3x%vfsa$4gpx&2#$+_w7zu$)jf!k1')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = str2bool(os.environ.get('DEBUG', 'True'))
 print(f"DEBUG: {DEBUG}")
@@ -131,7 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
-STATIC_ROOT = os.environ.get('STATIC_ROOT', os.path.join(BASE_DIR, 'static/'))
+# STATIC_ROOT = os.environ.get('STATIC_ROOT', os.path.join(BASE_DIR, 'static/'))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -148,6 +147,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ALLOW_ALL_ORIGINS=str2bool(os.environ.get('CORS_ALLOW_ALL_ORIGINS', True))
+CORS_ALLOW_ALL_ORIGINS=str2bool(os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'True'))
 
 AUTH_PASSWORD_VALIDATORS = []
