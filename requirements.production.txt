@@ -1,6 +1,6 @@
-Django
-djangorestframework
-django-cors-headers
-pyjwt
-python-dotenv
-gunicorn
+Django==4.1.4
+djangorestframework==3.14.0
+django-cors-headers==3.13.0
+pyjwt==2.6.0
+python-dotenv==0.21.0
+gunicorn==20.1.0
