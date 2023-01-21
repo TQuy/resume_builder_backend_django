@@ -5,3 +5,4 @@ pyjwt
 autopep8
 python-dotenv
 gunicorn
+psycopg2
