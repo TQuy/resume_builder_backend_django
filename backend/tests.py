@@ -1,6 +1,5 @@
 import json
 import re
-from urllib import response
 from django.db import IntegrityError
 from django.test import TestCase
 from backend.models import Resume
@@ -8,6 +7,9 @@ from django.db import transaction
 from authentication.models import User
 from authentication.tests import UserTestCase
 from rest_framework.test import APIClient
+from backend.const import SAMPLE_RESUME
+from urllib.parse import urlencode
+
 
 # Create your tests here.
 
@@ -16,6 +18,7 @@ class ResumeTestCase(TestCase):
     def setUp(self):
         self.username = 'quynt'
         self.password = '1'
+        self.content = json.dumps(SAMPLE_RESUME)
 
     def test_resume_model(self):
         # create new account
@@ -26,16 +29,16 @@ class ResumeTestCase(TestCase):
 
         Resume.objects.create(
             name='first_resume',
-            content='hello world!',
+            content=self.content,
             user=user
         )
         self.assertEqual(Resume.objects.count(), 1)
-        # create the existed one
+        # create resume with existed name
         with self.assertRaises(IntegrityError) as err:
             with transaction.atomic():
                 Resume.objects.create(
                     name='first_resume',
-                    content='hi world!',
+                    content=self.content,
                     user=user
                 )
         self.assertTrue(
@@ -46,7 +49,7 @@ class ResumeTestCase(TestCase):
         # create new
         Resume.objects.create(
             name='second_resume',
-            content='hi world!',
+            content=self.content,
             user=user
         )
         self.assertEqual(Resume.objects.count(), 2)
@@ -60,15 +63,15 @@ class ResumeTestCase(TestCase):
         self.assertTrue(len(token) > 0)
 
         created_user = User.objects.get(username=self.username)
-        response = self.create_resume("first_resume", "hello world!", token)
+        response = self.create_resume("first_resume", self.content, token)
         self.assertEqual(response.status_code, 201)
         # check if new resume is added
         self.assertEqual(created_user.resume_set.count(), 1)
         # create the existed one
-        response = self.create_resume("first_resume", "hello world!", token)
+        response = self.create_resume("first_resume", self.content, token)
         self.assertEqual(response.status_code, 200)
         # modify the existed one
-        response = self.create_resume("first_resume", "hi world!", token)
+        response = self.create_resume("first_resume", self.content, token)
         self.assertEqual(response.status_code, 200)
 
     def test_list_resume(self):
@@ -80,7 +83,7 @@ class ResumeTestCase(TestCase):
         self.assertTrue(len(token) > 0)
         # create resume
         created_user = User.objects.get(username=self.username)
-        response = self.create_resume("first_resume", "hello world!", token)
+        response = self.create_resume("first_resume", self.content, token)
         self.assertEqual(response.status_code, 201)
         # list_resume
         response = self.list_resume(token)
@@ -103,18 +106,19 @@ class ResumeTestCase(TestCase):
         self.assertTrue(len(token) > 0)
         # create resume
         created_user = User.objects.get(username=self.username)
-        response = self.create_resume("first_resume", "hello world!", token)
-        resume_id = json.loads(response.content)['resume']['id']
+        input_name = "first_resume"
+        response = self.create_resume(input_name, self.content, token)
+        resume_name = json.loads(response.content)['resume']['name']
         self.assertEqual(response.status_code, 201)
         # read resume
-        response = self.read_resume(token, resume_id)
+        response = self.read_resume(token, resume_name)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            resume_id, json.loads(
-                response.content)['resume']['id'])
+            input_name, json.loads(
+                response.content)['resume']['name'])
         # delete resume, then read again
-        created_user.resume_set.filter(pk=resume_id).delete()
-        response = self.read_resume(token, resume_id)
+        created_user.resume_set.filter(name=resume_name).delete()
+        response = self.read_resume(token, resume_name)
         self.assertEqual(response.status_code, 404)
 
     def test_delete_resume(self):
@@ -126,18 +130,19 @@ class ResumeTestCase(TestCase):
         self.assertTrue(len(token) > 0)
         # create resume
         created_user = User.objects.get(username=self.username)
-        response = self.create_resume("first_resume", "hello world!", token)
-        resume_id = json.loads(response.content)['resume']['id']
+        input_name = "first_resume"
+        response = self.create_resume(input_name, self.content, token)
+        resume_name = json.loads(response.content)['resume']['name']
         self.assertEqual(response.status_code, 201)
         current_resume_quantity = created_user.resume_set.count()
-        # delte resume
-        response = self.delete_resume(token, resume_id)
+        # delete resume
+        response = self.delete_resume(token, resume_name)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             current_resume_quantity - 1,
             created_user.resume_set.count())
         # delte non-existed resume
-        response = self.delete_resume(token, resume_id)
+        response = self.delete_resume(token, resume_name)
         self.assertEqual(response.status_code, 204)
 
     @staticmethod
@@ -157,15 +162,19 @@ class ResumeTestCase(TestCase):
         return response
 
     @staticmethod
-    def read_resume(token: str, id: int):
+    def read_resume(token: str, name: str):
         client = APIClient()
         response = client.get(
-            f"/resumes/{id}", **{"HTTP_AUTHORIZATION": f"Bearer {token}"})
+            f"/resumes/{name}", **{"HTTP_AUTHORIZATION": f"Bearer {token}"})
         return response
 
     @staticmethod
-    def delete_resume(token: str, id: int):
+    def delete_resume(token: str, name: str):
         client = APIClient()
+        data = {"name": name}
         response = client.delete(
-            f"/resumes/{id}", **{"HTTP_AUTHORIZATION": f"Bearer {token}"})
+            f"/resumes/",
+            **{"HTTP_AUTHORIZATION": f"Bearer {token}", "QUERY_STRING": urlencode(data)},
+
+        )
         return response
