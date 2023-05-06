@@ -1,30 +1,33 @@
-import json
 from django.shortcuts import render, redirect
-from django.db import IntegrityError
+from django.db.models import QuerySet
 from rest_framework import status
-from authentication.decorators import token_required
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import User, Resume
+from rest_framework.decorators import api_view
+
+from authentication.decorators import token_required
+from backend.models import Resume
+from authentication.models import User
 from backend.serializers import ResumeSerializer
 
 # Create your views here.
 
 
 @token_required
-@api_view(['GET', 'PUT'])
-def resumes(request, current_user):
+@api_view(['GET', 'PUT', 'DELETE'])
+def resumes(request, current_user: User) -> Response:
+    """GET resumes or PUT resume"""
     if request.method == 'GET':
         # list resumes of current user
-        resumes = current_user.resume_set.values('id', 'name')
+        resumes: QuerySet = current_user.resume_set.all()
+
         return Response({
-            "resumes": resumes
+            "resumes": ResumeSerializer(resumes, many=True).data
         }, status=status.HTTP_200_OK)
 
     elif request.method == 'PUT':
         # update or create current user's resume
-        name = request.data['name']
-        content = request.data['content']
+        name = request.data.get('name')
+        content = request.data.get('content')
 
         if name is None or content is None:
             return Response({
@@ -46,12 +49,29 @@ def resumes(request, current_user):
             "resume": resume_json.data,
         }, status=status.HTTP_200_OK)
 
+    if request.method == "DELETE":
+        resume_name = request.query_params.get('name')
+
+        if resume_name is None:
+            return Response({
+                "error": "resume_name not found"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        count, _ = current_user.resume_set.filter(name=resume_name).delete()
+
+        if count == 0:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response({
+            "message": "OK"
+        }, status=status.HTTP_200_OK)
+
 
 @token_required
-@api_view(['GET', 'DELETE'])
-def resume(request, current_user, resume_id):
+@api_view(['GET'])
+def resume(request, current_user: User, resume_name: str) -> Response:
     if request.method == 'GET':
-        resume = current_user.resume_set.filter(pk=resume_id).first()
+        resume = current_user.resume_set.filter(name=resume_name).first()
 
         if resume is None:
             return Response({
@@ -61,14 +81,4 @@ def resume(request, current_user, resume_id):
         resume_json = ResumeSerializer(resume)
         return Response({
             'resume': resume_json.data
-        }, status=status.HTTP_200_OK)
-
-    if request.method == "DELETE":
-        count, _ = current_user.resume_set.filter(pk=resume_id).delete()
-
-        if count == 0:
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
-        return Response({
-            "data": "OK"
         }, status=status.HTTP_200_OK)
