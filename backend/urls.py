@@ -5,5 +5,5 @@ app_name = 'backend'
 
 urlpatterns = [
     path('', views.resumes),
-    path('<str:resume_name>', views.resume)
+    path('/<str:resume_name>', views.resume)
 ]

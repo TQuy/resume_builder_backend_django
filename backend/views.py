@@ -38,19 +38,17 @@ def resumes(request, current_user: User) -> Response:
             user=current_user, name=name, defaults={
                 "content": content})
 
-        resume_json = ResumeSerializer(resume)
-
         if created:
             return Response({
-                "resume": resume_json.data
+                "message": "Resume saved successfully."
             }, status=status.HTTP_201_CREATED)
 
         return Response({
-            "resume": resume_json.data,
+            "resume": "Error happened, save unsuccessfully.",
         }, status=status.HTTP_200_OK)
 
     if request.method == "DELETE":
-        resume_name = request.query_params.get('name')
+        resume_name = request.data.get('name')
 
         if resume_name is None:
             return Response({
